@@ -5,12 +5,16 @@ namespace Drupal\update\Form;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
+use Drupal\update\ModuleVersion;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure update settings for this site.
+ *
+ * @internal
  */
 class UpdateManagerUpdate extends FormBase {
 
@@ -69,7 +73,7 @@ class UpdateManagerUpdate extends FormBase {
       '#last' => $this->state->get('update.last_check') ?: 0,
     ];
     $form['last_check'] = [
-      '#markup' => drupal_render($last_markup),
+      '#markup' => \Drupal::service('renderer')->render($last_markup),
     ];
 
     if (!_update_manager_check_backends($form, 'update')) {
@@ -106,7 +110,7 @@ class UpdateManagerUpdate extends FormBase {
       // The project name to display can vary based on the info we have.
       if (!empty($project['title'])) {
         if (!empty($project['link'])) {
-          $project_name = $this->l($project['title'], Url::fromUri($project['link']));
+          $project_name = Link::fromTextAndUrl($project['title'], Url::fromUri($project['link']))->toString();
         }
         else {
           $project_name = $project['title'];
@@ -130,7 +134,8 @@ class UpdateManagerUpdate extends FormBase {
 
       $recommended_release = $project['releases'][$project['recommended']];
       $recommended_version = '{{ release_version }} (<a href="{{ release_link }}" title="{{ project_title }}">{{ release_notes }}</a>)';
-      if ($recommended_release['version_major'] != $project['existing_major']) {
+      $recommended_version_parser = ModuleVersion::createFromVersionString($recommended_release['version']);
+      if ($recommended_version_parser->getMajorVersion() != $project['existing_major']) {
         $recommended_version .= '<div title="{{ major_update_warning_title }}" class="update-major-version-warning">{{ major_update_warning_text }}</div>';
       }
 
@@ -181,10 +186,12 @@ class UpdateManagerUpdate extends FormBase {
       }
 
       // Use the project title for the tableselect checkboxes.
-      $entry['title'] = ['data' => [
-        '#title' => $entry['title'],
-        '#markup' => $entry['title'],
-      ]];
+      $entry['title'] = [
+        'data' => [
+          '#title' => $entry['title'],
+          '#markup' => $entry['title'],
+        ],
+      ];
       $entry['#attributes'] = ['class' => ['update-' . $type]];
 
       // Drupal core needs to be upgraded manually.
@@ -278,7 +285,7 @@ class UpdateManagerUpdate extends FormBase {
 
     if (!empty($projects['manual'])) {
       $prefix = '<h2>' . $this->t('Manual updates required') . '</h2>';
-      $prefix .= '<p>' . $this->t('Updates of Drupal core are not supported at this time.') . '</p>';
+      $prefix .= '<p>' . $this->t('Automatic updates of Drupal core are not supported at this time.') . '</p>';
       $form['manual_updates'] = [
         '#type' => 'table',
         '#header' => $headers,

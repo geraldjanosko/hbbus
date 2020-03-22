@@ -20,6 +20,11 @@ class ColorTest extends BrowserTestBase {
   public static $modules = ['color', 'color_test', 'block', 'file'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * A user with administrative permissions.
    *
    * @var \Drupal\user\UserInterface
@@ -65,7 +70,7 @@ class ColorTest extends BrowserTestBase {
         'scheme_color' => '#3b3b3b',
       ],
     ];
-    \Drupal::service('theme_handler')->install(array_keys($this->themes));
+    \Drupal::service('theme_installer')->install(array_keys($this->themes));
 
     // Array filled with valid and not valid color values.
     $this->colorTests = [
@@ -117,7 +122,7 @@ class ColorTest extends BrowserTestBase {
     $stylesheets = $this->config('color.theme.' . $theme)->get('stylesheets');
     foreach ($stylesheets as $stylesheet) {
       $this->assertPattern('|' . file_url_transform_relative(file_create_url($stylesheet)) . '|', 'Make sure the color stylesheet is included in the content. (' . $theme . ')');
-      $stylesheet_content = join("\n", file($stylesheet));
+      $stylesheet_content = implode("\n", file($stylesheet));
       $this->assertTrue(strpos($stylesheet_content, 'color: #123456') !== FALSE, 'Make sure the color we changed is in the color stylesheet. (' . $theme . ')');
     }
 
@@ -129,7 +134,7 @@ class ColorTest extends BrowserTestBase {
     $this->drupalGet('<front>');
     $stylesheets = $this->config('color.theme.' . $theme)->get('stylesheets');
     foreach ($stylesheets as $stylesheet) {
-      $stylesheet_content = join("\n", file($stylesheet));
+      $stylesheet_content = implode("\n", file($stylesheet));
       $this->assertTrue(strpos($stylesheet_content, 'color: ' . $test_values['scheme_color']) !== FALSE, 'Make sure the color we changed is in the color stylesheet. (' . $theme . ')');
     }
 
@@ -141,7 +146,7 @@ class ColorTest extends BrowserTestBase {
     $stylesheets = \Drupal::state()->get('drupal_css_cache_files') ?: [];
     $stylesheet_content = '';
     foreach ($stylesheets as $uri) {
-      $stylesheet_content .= join("\n", file(drupal_realpath($uri)));
+      $stylesheet_content .= implode("\n", file(\Drupal::service('file_system')->realpath($uri)));
     }
     $this->assertTrue(strpos($stylesheet_content, 'public://') === FALSE, 'Make sure the color paths have been translated to local paths. (' . $theme . ')');
     $config->set('css.preprocess', 0);

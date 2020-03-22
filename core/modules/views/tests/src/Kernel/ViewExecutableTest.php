@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\views\Kernel;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Xss;
 use Drupal\node\Entity\NodeType;
@@ -19,6 +20,7 @@ use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Plugin\views\pager\PagerPluginBase;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest;
+use PHPUnit\Framework\Error\Warning;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -38,7 +40,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_destroy', 'test_executable_displays'];
+  public static $testViews = ['test_destroy', 'test_executable_displays', 'test_argument_dependency'];
 
   /**
    * Properties that should be stored in the configuration.
@@ -123,7 +125,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
       if ($type == 'relationship') {
         continue;
       }
-      $this->assertTrue(count($view->$type), format_string('Make sure a %type instance got instantiated.', ['%type' => $type]));
+      $this->assertGreaterThan(0, count($view->$type), new FormattableMarkup('Make sure a %type instance got instantiated.', ['%type' => $type]));
     }
 
     // initHandlers() should create display handlers automatically as well.
@@ -136,7 +138,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     // Test the initStyle() method.
     $view->initStyle();
     $this->assertTrue($view->style_plugin instanceof DefaultStyle, 'Make sure a reference to the style plugin is set.');
-    // Test the plugin has been inited and view have references to the view and
+    // Test the plugin has been invited and view have references to the view and
     // display handler.
     $this->assertEqual(spl_object_hash($view->style_plugin->view), $view_hash);
     $this->assertEqual(spl_object_hash($view->style_plugin->displayHandler), $display_hash);
@@ -196,8 +198,13 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $view->initDisplay();
 
     // Error is triggered while calling the wrong display.
-    $this->setExpectedException(\PHPUnit_Framework_Error::class);
-    $view->setDisplay('invalid');
+    try {
+      $view->setDisplay('invalid');
+      $this->fail('Expected error, when setDisplay() called with invalid display ID');
+    }
+    catch (Warning $e) {
+      $this->assertEquals('setDisplay() called with invalid display ID "invalid".', $e->getMessage());
+    }
 
     $this->assertEqual($view->current_display, 'default', 'If setDisplay is called with an invalid display id the default display should be used.');
     $this->assertEqual(spl_object_hash($view->display_handler), spl_object_hash($view->displayHandlers->get('default')));
@@ -256,7 +263,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertTrue($view->rowPlugin instanceof Fields);
 
     // Test the newDisplay() method.
-    $view = $this->container->get('entity.manager')->getStorage('view')->create(['id' => 'test_executable_displays']);
+    $view = $this->container->get('entity_type.manager')->getStorage('view')->create(['id' => 'test_executable_displays']);
     $executable = $view->getExecutable();
 
     $executable->newDisplay('page');
@@ -427,10 +434,10 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     $count = 0;
     foreach ($view->displayHandlers as $id => $display) {
-      $match = function($value) use ($display) {
+      $match = function ($value) use ($display) {
         return strpos($value, $display->display['display_title']) !== FALSE;
       };
-      $this->assertTrue(array_filter($validate[$id], $match), format_string('Error message found for @id display', ['@id' => $id]));
+      $this->assertNotEmpty(array_filter($validate[$id], $match), new FormattableMarkup('Error message found for @id display', ['@id' => $id]));
       $count++;
     }
 
@@ -487,6 +494,52 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertIdentical($unserialized->current_display, 'page_1', 'The expected display was set on the unserialized view.');
     $this->assertIdentical($unserialized->args, ['test'], 'The expected argument was set on the unserialized view.');
     $this->assertIdentical($unserialized->getCurrentPage(), 2, 'The expected current page was set on the unserialized view.');
+
+    // Get the definition of node's nid field, for example. Only get it not from
+    // the field manager directly, but from the item data definition. It should
+    // be the same base field definition object (the field and item definitions
+    // refer to each other).
+    // See https://bugs.php.net/bug.php?id=66052
+    $field_manager = $this->container->get('entity_field.manager');
+    $nid_definition_before = $field_manager->getBaseFieldDefinitions('node')['nid']
+      ->getItemDefinition()
+      ->getFieldDefinition();
+
+    // Load and execute a view.
+    $view_entity = View::load('content');
+    $view_executable = $view_entity->getExecutable();
+    $view_executable->execute('page_1');
+
+    // Reset the static cache. Don't use clearCachedFieldDefinitions() since
+    // that clears the persistent cache and we need to get the serialized cache
+    // data.
+    $field_manager->useCaches(FALSE);
+    $field_manager->useCaches(TRUE);
+
+    // Serialize the ViewExecutable as part of other data.
+    unserialize(serialize(['SOMETHING UNEXPECTED', $view_executable]));
+
+    // Make sure the serialisation of the ViewExecutable didn't influence the
+    // field definitions.
+    $nid_definition_after = $field_manager->getBaseFieldDefinitions('node')['nid']
+      ->getItemDefinition()
+      ->getFieldDefinition();
+    $this->assertEquals($nid_definition_before->getPropertyDefinitions(), $nid_definition_after->getPropertyDefinitions());
+  }
+
+  /**
+   * Tests if argument overrides by validators are propagated to tokens.
+   */
+  public function testArgumentValidatorValueOverride() {
+    $view = Views::getView('test_argument_dependency');
+    $view->setDisplay('page_1');
+    $view->setArguments(['1', 'this value should be replaced']);
+    $view->execute();
+    $expected = [
+      '{{ arguments.uid }}' => '1',
+      '{{ raw_arguments.uid }}' => '1',
+    ];
+    $this->assertEquals($expected, $view->build_info['substitutions']);
   }
 
 }

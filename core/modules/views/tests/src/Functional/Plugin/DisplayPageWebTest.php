@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
-use Drupal\system\Tests\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 
@@ -28,6 +28,11 @@ class DisplayPageWebTest extends ViewTestBase {
    * @var array
    */
   public static $modules = ['menu_ui', 'block', 'views_ui'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
 
   /**
    * {@inheritdoc}
@@ -135,7 +140,7 @@ class DisplayPageWebTest extends ViewTestBase {
 
     $view = Views::getView('test_page_display');
     $xpath = $this->cssSelect('div.view:contains("' . $view->getTitle() . '")');
-    $this->assertFalse($xpath, 'The view title was not displayed in the view markup.');
+    $this->assertEmpty($xpath, 'The view title was not displayed in the view markup.');
   }
 
   /**

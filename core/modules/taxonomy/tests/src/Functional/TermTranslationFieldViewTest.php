@@ -3,7 +3,6 @@
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\node\Entity\Node;
-use Drupal\taxonomy\Tests\TaxonomyTranslationTestTrait;
 
 /**
  * Tests the translation of taxonomy terms field on nodes.
@@ -42,6 +41,11 @@ class TermTranslationFieldViewTest extends TaxonomyTestBase {
    */
   public static $modules = ['language', 'content_translation', 'taxonomy'];
 
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
   protected function setUp() {
     parent::setUp();
     $this->setupLanguages();
@@ -75,10 +79,12 @@ class TermTranslationFieldViewTest extends TaxonomyTestBase {
     $node = Node::create([
       'title' => $this->randomMachineName(),
       'type' => 'article',
-      'description' => [[
-        'value' => $this->randomMachineName(),
-        'format' => 'basic_html'
-      ]],
+      'description' => [
+        [
+          'value' => $this->randomMachineName(),
+          'format' => 'basic_html',
+        ],
+      ],
       $this->termFieldName => [['target_id' => $this->term->id()]],
       'langcode' => $this->baseLangcode,
     ]);

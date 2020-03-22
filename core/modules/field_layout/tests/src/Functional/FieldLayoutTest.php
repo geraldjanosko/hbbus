@@ -19,6 +19,11 @@ class FieldLayoutTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -28,9 +33,9 @@ class FieldLayoutTest extends BrowserTestBase {
     $this->createNode([
       'type' => 'article',
       'title' => 'The node title',
-      'body' => [[
-        'value' => 'The node body',
-      ]],
+      'body' => [
+        ['value' => 'The node body'],
+      ],
     ]);
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
