@@ -1,0 +1,101 @@
+<?php
+
+function hbb_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface &$form_state, $form_id = NULL) {
+  // Work-around for a core bug affecting admin themes. See issue #943212.
+  if (isset($form_id)) {
+    return;
+  }
+  $form['advancedSettings'] = [
+    '#type'    => 'fieldset',
+    '#title'   => t('Advanced Theme Settings'),
+  ];
+
+  $form['advancedSettings']['themeHeaderURL'] = [
+    '#type'            => 'textfield',
+    '#default_value'   => theme_get_setting('themeHeaderURL'),
+    '#title'           => t('Theme Header URL'),
+    '#description'     => t('The URL to the image you will use for the header,'),
+    '#required'        => FALSE,
+  ];
+
+  $form['advancedSettings']['themeLogoText'] = [
+    '#type'            => 'textfield',
+    '#default_value'   => theme_get_setting('themeLogoText'),
+    '#title'           => t('The text to be used as the logo'),
+    '#required'        => FALSE,
+  ];
+  $form['advancedSettings']['btnLabel01'] = [
+    '#type'            => 'textfield',
+    '#default_value'   => theme_get_setting('btnLabel01'),
+    '#title'           => t('The label for button 01 in the header.'),
+    '#required'        => FALSE,
+  ];
+  $form['advancedSettings']['btnURL01'] = [
+    '#type'            => 'textfield',
+    '#default_value'   => theme_get_setting('btnURL01'),
+    '#title'           => t('The URL for button 01 in the header.'),
+    '#required'        => FALSE,
+  ];
+  $form['advancedSettings']['btnLabel02'] = [
+    '#type'            => 'textfield',
+    '#default_value'   => theme_get_setting('btnLabel02'),
+    '#title'           => t('The label for button 01 in the header.'),
+    '#required'        => FALSE,
+  ];
+  $form['advancedSettings']['btnURL02'] = [
+    '#type'            => 'textfield',
+    '#default_value'   => theme_get_setting('btnURL02'),
+    '#title'           => t('The URL for button 01 in the header.'),
+    '#required'        => FALSE,
+  ];
+}
+function hbb_preprocess_page(&$variables) {
+  // Load custom variables from theme settings
+  $variables['themeHeaderURL'] = theme_get_setting('themeHeaderURL');
+  $variables['btnLabel01'] = theme_get_setting('btnLabel01');
+  $variables['btnURL01'] = theme_get_setting('btnURL01');
+  $variables['btnLabel02'] = theme_get_setting('btnLabel02');
+  $variables['btnURL02'] = theme_get_setting('btnURL02');
+  $variables['locationsBtnURL'] = theme_get_setting('locationsBtnURL');
+  // Load the site name out of configuration.
+  $config = \Drupal::config('system.site');
+  $variables['site_name'] = $config->get('name');
+  $variables['site_slogan'] = $config->get('slogan');
+  // Add themeUrl to drupalSettings js
+  $variables['#attached']['drupalSettings']['path']['themeUrl'] = \Drupal::theme()->getActiveTheme()->getPath();
+}
+function hbb_preprocess_breadcrumb(&$variables) {
+
+	if(($node = \Drupal::routeMatch()->getParameter('node')) && $variables['breadcrumb']){
+		$variables['breadcrumb'][] = array(
+			'text' => $node->getTitle(),
+			'url' => $node->URL()
+		);
+    $variables['#cache']['contexts'][] = 'url';
+    $variables['#cache']['contexts'][] = 'session';
+    $variables['#cache']['contexts'][] = 'user';  
+	}
+
+}
+
+function hbb_preprocess_block(&$variables) {
+  $variables['themeLogoText'] = theme_get_setting('themeLogoText');
+}
+// Add bootstrap classes to forms
+function hbb_preprocess_form_element(&$variables) {
+  $variables['attributes']['class'][] = 'form-group';
+}
+function hbb_preprocess_input(&$variables) {
+  $element = $variables['element'];
+	
+  if ($element['#type'] != 'submit') {
+    $variables['attributes']['class'][] = 'form-control';
+	} else {
+    $variables['attributes']['class'][] = 'btn btn-primary btn-md';
+	}
+}
+function hbb_preprocess_select(&$variables) {
+  $element = $variables['element'];
+	
+  $variables['attributes']['class'][] = 'form-control';
+}

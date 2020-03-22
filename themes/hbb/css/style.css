@@ -1,0 +1,209 @@
+/* Global */
+a {
+	color: #6f8bd7;
+}
+a:hover {
+	color: #5672BE;
+}
+a:hover {
+	text-decoration: none;
+}
+h1, .h1, h2, .h2, h3, .h3, h4, .h4 {
+	color: #6f8bd7;
+	font-family: 'Montserrat', sans-serif !important;
+}
+h1, .h1 {
+	font-size: 1.5rem;
+}
+h2, .h2 {
+	font-size: 1.25rem;
+}
+.text-secondary {
+	color: #D6BB6F;
+}
+.img-fluid.fw {
+	width: 100% !important;
+}
+.mlb {
+	margin: 0 0 15px 15px;
+}
+.mrb {
+	margin: 0 15px 15px 0;
+}
+/* Navbar */
+.navbar-brand {
+	font-family: 'Montserrat', sans-serif !important;
+}
+.navbar-light .navbar-nav .nav-link {
+	/*color: rgba(111, 139, 215, 0.7) !important;*/
+	font-family: 'Montserrat', sans-serif;
+}
+.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+/*color: rgba(111, 139, 215, 1) !important;*/
+}
+.navbar-light .navbar-nav .active > .nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.open, .navbar-light .navbar-nav .open > .nav-link {
+/*color: rgba(111, 139, 215, 1) !important;*/
+}
+.dropdown-menu {
+	background-color: #6f8bd7;
+	border: 1px solid #6f8bd7;
+	border-radius: 0;
+	color: #ff0000;
+	margin: 0.5rem 0 0;
+	padding: 0;
+}
+.dropdown-item {
+	background: transparent;
+	border-bottom: 1px solid #89A5F1;
+	color: #fff;
+	padding: 0.3rem 1.5rem;
+}
+li:last-of-type .dropdown-item {
+	border: none;
+}
+.dropdown-item:hover {
+	background-color: #89A5F1;
+}
+/* Bootstrap Btns */
+.btn-wrapper {
+	margin: 10px 0;
+}
+.btn {
+	font-weight: bold;
+}
+.btn-primary {
+	background-color: #6f8bd7;
+	border-color: #6f8bd7;
+}
+.btn-primary:hover {
+	background-color: #89A5F1;
+	border-color: #89A5F1;
+}
+.btn-secondary {
+	background-color: #D6BB6F;
+	border-color: #D6BB6F;
+	color: #fff;
+}
+.btn-secondary:hover {
+	background-color: #BDA256;
+	border-color: #BDA256;
+	color: #fff;
+}
+.btn-lb {
+	background: rgba(159, 190, 250, 0.4) none repeat scroll 0 0;
+	border-color: rgba(159, 190, 250, 0.4) none repeat scroll 0 0;
+	color: #333;
+}
+.btn-white {
+	background-color: #fff;
+	border-color: #fff;
+	color: #333;
+}
+.btn-white {
+	background-color: #e6e6e6;
+	border-color: #e6e6e6;
+	color: #333;
+}
+/* Cards */
+.card-outline-white {
+	border-color: #fff;
+}
+/* Sections */
+.container {
+	min-width: 360px;
+}
+.section {
+	padding: 25px 0;
+}
+.section-blue {
+	background: #6f8bd7 none repeat scroll 0 0;
+}
+/* Theme Header */
+#theme-header {
+	overflow: hidden;
+	position: relative;
+	padding: 0;
+}
+#theme-header img {
+	height: auto;
+	min-width: 800px;
+}
+#site-info-wrapper {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	left: 0;
+}
+#site-info {
+	text-align: center;
+}
+.site-info {
+	color: #fff;
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 900;
+	text-shadow: 1px 1px #666;
+}
+#site-name {
+	font-size: 1rem;
+}
+#site-slogan {
+	font-size: 0.875rem;
+}
+/* Articles */
+.article-wrapper {
+	margin-bottom: 30px;
+}
+.article-wrapper:last-of-type {
+	margin-bottom: 0;
+}
+/* Footer */
+footer#footer {
+	color: #fff;
+	margin-top: 30px;
+}
+/* Extra Small Horizontal Devices */
+@media only screen and (max-width: 576px) {
+.navbar-toggleable-md > .container {
+	position: static;
+	width: 100%;
+}
+}
+@media only screen and (min-width: 576px) {
+/* Global */
+h1, .h1 {
+	font-size: 1.75rem;
+}
+h2, .h2 {
+	font-size: 1.5rem;
+}
+/* Theme Header */
+#site-name {
+	font-size: 1.625rem;
+}
+#site-slogan {
+	font-size: 1.25rem;
+}
+/* Sections */
+#main-content {
+	min-height: 500px;
+}
+}
+@media only screen and (min-width: 768px) {
+/* Global */
+h1, .h1 {
+	font-size: 2.25rem;
+}
+/* Bootstrap Btns */
+.btn-wrapper {
+	margin: 25px 0;
+}
+}
+@media only screen and (min-width: 992px) {
+/* Theme Header */
+#site-name {
+	font-size: 2.25rem;
+}
+#site-slogan {
+	font-size: 1.875rem;
+}
+}

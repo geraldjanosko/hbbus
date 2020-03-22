@@ -1,0 +1,15 @@
+name: HBB
+type: theme
+description: 'A custom theme for Hartford Business Brokers'
+core: 8.x
+libraries:
+  - hbb/bootstrap
+  - hbb/flex-vertical-center
+  - hbb/global-styling
+base theme: classy
+regions:
+  header: Header
+  before_content: 'Before Content'
+  content: Content
+  sidebar_second: 'Sidebar Second'
+  footer: Footer

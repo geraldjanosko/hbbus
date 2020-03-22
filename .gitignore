@@ -1,0 +1,33 @@
+# Ignore configuration files that may contain sensitive information.
+sites/*/settings*.php
+*.sql
+*.sql.gz
+
+# Ignore paths that contain user-generated content.
+sites/*/files
+sites/*/private
+
+# Sub website directories
+arnoldcurtis
+curtisbldg
+hbbga
+hbbjac
+hbbjacOLD
+hbbkac
+hbbnc
+hbbnc1
+hbbstaug
+hbbtn
+hbbus
+hbbva
+hbpus
+htfdbus
+nancyarnold
+nancyarnoldrealty
+staugbusinessbrokers
+trademarkct/
+
+# Ignore
+core/lib/Drupal/Core/DrupalKernel.php.backup.1522544387
+/ManagedFile.php.sa-core-2018-004.1533699663
+core/modules/file/src/Element/ManagedFile.php.sa-core-2018-004.1533699663
