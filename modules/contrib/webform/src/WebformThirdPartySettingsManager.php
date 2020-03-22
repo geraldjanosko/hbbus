@@ -4,9 +4,7 @@ namespace Drupal\webform;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\PathValidatorInterface;
-use Drupal\Core\Render\Element;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -38,7 +36,7 @@ class WebformThirdPartySettingsManager implements WebformThirdPartySettingsManag
   protected $pathValidator;
 
   /**
-   * Add-ons manager.
+   * The webform add-ons manager.
    *
    * @var \Drupal\webform\WebformAddonsManagerInterface
    */
@@ -61,7 +59,7 @@ class WebformThirdPartySettingsManager implements WebformThirdPartySettingsManag
    * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
    *   The path validator.
    * @param \Drupal\webform\WebformAddonsManagerInterface $addons_manager
-   *   The add-ons manager.
+   *   The webform add-ons manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, PathValidatorInterface $path_validator, WebformAddonsManagerInterface $addons_manager) {
     $this->configFactory = $config_factory;
@@ -69,7 +67,7 @@ class WebformThirdPartySettingsManager implements WebformThirdPartySettingsManag
     $this->pathValidator = $path_validator;
     $this->addonsManager = $addons_manager;
 
-    $this->config = $this->configFactory->getEditable('webform.settings');
+    $this->config = $this->configFactory->get('webform.settings');
     $this->loadIncludes();
   }
 
@@ -100,7 +98,9 @@ class WebformThirdPartySettingsManager implements WebformThirdPartySettingsManag
    * {@inheritdoc}
    */
   public function setThirdPartySetting($module, $key, $value) {
-    $this->config->set("third_party_settings.$module.$key", $value);
+    $config = $this->configFactory->getEditable('webform.settings');
+    $config->set("third_party_settings.$module.$key", $value);
+    $config->save();
     return $this;
   }
 
@@ -123,12 +123,14 @@ class WebformThirdPartySettingsManager implements WebformThirdPartySettingsManag
    * {@inheritdoc}
    */
   public function unsetThirdPartySetting($module, $key) {
-    $this->config->clear("third_party_settings.$module.$key");
+    $config = $this->configFactory->getEditable('webform.settings');
+    $config->clear("third_party_settings.$module.$key");
     // If the third party is no longer storing any information, completely
     // remove the array holding the settings for this module.
-    if (!$this->config->get("third_party_settings.$module")) {
-      $this->config->clear("third_party_settings.$module");
+    if (!$config->get("third_party_settings.$module")) {
+      $config->clear("third_party_settings.$module");
     }
+    $config->save();
     return $this;
   }
 

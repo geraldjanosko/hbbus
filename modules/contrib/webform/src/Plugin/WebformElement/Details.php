@@ -20,22 +20,43 @@ class Details extends ContainerBase {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultProperties() {
-    return parent::getDefaultProperties() + [
-      // Form display.
+  protected function defineDefaultProperties() {
+    return [
+      // Description/Help.
+      'help' => '',
+      'help_title' => '',
+      'description' => '',
+      'more' => '',
+      'more_title' => '',
+      // Title.
+      'title_display' => '',
+      'help_display' => '',
+      // Details.
       'open' => FALSE,
-    ];
+      'summary_attributes' => [],
+    ] + parent::defineDefaultProperties();
   }
+
+  /****************************************************************************/
 
   /**
    * {@inheritdoc}
    */
-  public function prepare(array &$element, WebformSubmissionInterface $webform_submission) {
+  public function prepare(array &$element, WebformSubmissionInterface $webform_submission = NULL) {
     parent::prepare($element, $webform_submission);
 
     if (isset($element['#webform_key'])) {
       $element['#attributes']['data-webform-key'] = $element['#webform_key'];
     }
+
+    $element['#attached']['library'][] = 'webform/webform.element.details';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getItemDefaultFormat() {
+    return 'details';
   }
 
   /**

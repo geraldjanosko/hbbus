@@ -20,27 +20,28 @@ class WebformAutocomplete extends TextField {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultProperties() {
-    $default_properties = parent::getDefaultProperties() + [
-      'multiple' => FALSE,
-      'multiple__header_label' => '',
+  protected function defineDefaultProperties() {
+    $properties = [
       // Autocomplete settings.
       'autocomplete_existing' => FALSE,
       'autocomplete_items' => [],
       'autocomplete_limit' => 10,
       'autocomplete_match' => 3,
       'autocomplete_match_operator' => 'CONTAINS',
-    ];
-    // Remove autocomplete property which is not applicable to this autocomplete
-    // element.
-    unset($default_properties['autocomplete']);
-    return $default_properties;
+    ] + parent::defineDefaultProperties()
+      + $this->defineDefaultMultipleProperties();
+    // Remove autocomplete property which is not applicable to
+    // this autocomplete element.
+    unset($properties['autocomplete']);
+    return $properties;
   }
+
+  /****************************************************************************/
 
   /**
    * {@inheritdoc}
    */
-  public function prepare(array &$element, WebformSubmissionInterface $webform_submission) {
+  public function prepare(array &$element, WebformSubmissionInterface $webform_submission = NULL) {
     parent::prepare($element, $webform_submission);
 
     $has_items = !empty($element['#autocomplete_items']);
@@ -80,7 +81,7 @@ class WebformAutocomplete extends TextField {
     ];
     $form['autocomplete']['autocomplete_existing'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Include existing submission values.'),
+      '#title' => $this->t('Include existing submission values'),
       '#description' => $this->t("If checked, all existing submission values will be visible to the webform's users."),
       '#return_value' => TRUE,
     ];

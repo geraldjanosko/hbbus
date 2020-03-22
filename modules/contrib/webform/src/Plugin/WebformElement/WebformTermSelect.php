@@ -3,6 +3,7 @@
 namespace Drupal\webform\Plugin\WebformElement;
 
 use Drupal\webform\Element\WebformTermSelect as TermSelectElement;
+use Drupal\webform\Plugin\WebformElementEntityReferenceInterface;
 
 /**
  * Provides a 'webform_term_select' element.
@@ -17,25 +18,28 @@ use Drupal\webform\Element\WebformTermSelect as TermSelectElement;
  *   }
  * )
  */
-class WebformTermSelect extends Select implements WebformEntityReferenceInterface {
+class WebformTermSelect extends Select implements WebformElementEntityReferenceInterface {
 
   use WebformTermReferenceTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefaultProperties() {
-    $properties = parent::getDefaultProperties() + [
+  protected function defineDefaultProperties() {
+    $properties = [
       'vocabulary' => '',
       'breadcrumb' => FALSE,
       'breadcrumb_delimiter' => ' › ',
       'tree_delimiter' => '-',
-    ];
-
-    unset($properties['options']);
-    unset($properties['options_randomize']);
+    ] + parent::defineDefaultProperties();
+    unset(
+      $properties['options'],
+      $properties['options_randomize']
+    );
     return $properties;
   }
+
+  /****************************************************************************/
 
   /**
    * {@inheritdoc}
